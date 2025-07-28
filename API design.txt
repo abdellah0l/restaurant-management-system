@@ -1,0 +1,45 @@
+# API Endpoints Design
+
+## Authentication
+- POST   /api/auth/login         - User login (returns user info & token)
+- GET    /api/auth/me            - Get current logged-in user info
+
+## Products
+- GET    /api/products           - Get all products
+- POST   /api/products           - Add new product
+- PUT    /api/products/:id       - Update product by ID
+- DELETE /api/products/:id       - Delete product by ID
+
+## Suppliers
+- GET    /api/suppliers          - Get all suppliers
+- POST   /api/suppliers          - Add new supplier
+- PUT    /api/suppliers/:id      - Update supplier by ID
+- DELETE /api/suppliers/:id      - Delete supplier by ID
+
+## Employees
+- GET    /api/employees          - Get all employees
+- POST   /api/employees          - Add new employee
+- PUT    /api/employees/:id      - Update employee by ID
+- DELETE /api/employees/:id      - Delete employee by ID
+
+## Transactions
+- GET    /api/transactions       - Get all transactions
+- POST   /api/transactions       - Add new transaction
+- PUT    /api/transactions/:id   - Update transaction by ID
+- DELETE /api/transactions/:id   - Delete transaction by ID
+
+## Reports
+- GET    /api/reports/daily      - Get daily financial report (sales, purchases, expenses, net profit, transactions)
+- GET    /api/reports/monthly    - Get monthly financial report (sales, purchases, expenses, net profit, transactions)
+
+## for the main page (dashboard)
+- we need : 
+    
+  const dailyReport = getDailyReport();
+  const monthlyReport = getMonthlyReport();
+
+  const lowStockProducts = products.filter(p => p.stock <= p.minStock);
+  const totalDebt = suppliers.reduce((sum, supplier) => sum + supplier.totalDebt, 0);
+
+## for the stock management
+- we need : 
