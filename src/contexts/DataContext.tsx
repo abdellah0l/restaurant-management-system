@@ -66,7 +66,6 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// Use environment variable for API URL in production, fallback to proxy in development
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -75,9 +74,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  // Fetch all data on mount
   useEffect(() => {
-    // Products
     axios.get(`${API_BASE}/products/`).then(res => {
       const products = (res.data as any[]).map((p: any) => ({
         id: p.id,
@@ -95,7 +92,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error fetching products:', err);
     });
 
-    // Suppliers
     axios.get(`${API_BASE}/suppliers/`).then(res => {
       const suppliers = (res.data as any[]).map((s: any) => ({
         id: s.id,
@@ -112,7 +108,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error fetching suppliers:', err);
     });
 
-    // Employees
     axios.get(`${API_BASE}/employees/`).then(res => {
       const employees = (res.data as any[]).map((e: any) => ({
         id: e.id,
@@ -132,7 +127,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error fetching employees:', err);
     });
 
-    // Transactions
     axios.get(`${API_BASE}/transactions/`).then(res => {
       const transactions = (res.data as any[]).map((t: any) => ({
         id: t.id,
@@ -153,12 +147,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       name: product.name,
       category: product.category,
       stock: product.stock,
-      unit: product.unit, // always string
+      unit: product.unit,
       price: product.price,
       min_stock: product.minStock,
     };
     const res = await axios.post<Product>(`${API_BASE}/products`, payload);
-    // Map backend response to frontend interface
     const newProduct = {
       id: res.data.id,
       name: res.data.name,
@@ -184,7 +177,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       min_stock: product.minStock ?? found.minStock,
     };
     const res = await axios.put<Product>(`${API_BASE}/products/${id}`, payload);
-    // Map backend response to frontend interface
     const updated = {
       id: res.data.id,
       name: res.data.name,
@@ -213,7 +205,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       total_paid: supplier.totalPaid
     };
     const res = await axios.post<Supplier>(`${API_BASE}/suppliers`, payload);
-    // Map backend response to frontend interface
     const newSupplier = {
       id: res.data.id,
       name: res.data.name,
@@ -239,7 +230,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       total_paid: supplier.totalPaid ?? found.totalPaid
     };
     const res = await axios.put<Supplier>(`${API_BASE}/suppliers/${id}`, payload);
-    // Map backend response to frontend interface
     const updated = {
       id: res.data.id,
       name: res.data.name,
@@ -270,7 +260,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       hire_date: employee.hireDate
     };
     const res = await axios.post<Employee>(`${API_BASE}/employees`, payload);
-    // Map backend response to frontend interface
     const newEmployee = {
       id: res.data.id,
       name: res.data.name,
@@ -301,7 +290,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       hire_date: employee.hireDate ?? found.hireDate
     };
     const res = await axios.put<Employee>(`${API_BASE}/employees/${id}`, payload);
-    // Map backend response to frontend interface
     const updated = {
       id: res.data.id,
       name: res.data.name,

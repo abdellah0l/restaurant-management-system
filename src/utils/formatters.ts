@@ -1,4 +1,3 @@
-// Utility functions for formatting data
 
 export const formatCurrency = (amount: number): string => {
   return `${amount.toLocaleString('ar-DZ')} دج`;

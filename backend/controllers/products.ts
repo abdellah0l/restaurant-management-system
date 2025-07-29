@@ -2,7 +2,6 @@ import pool from "../db/pool";
 import { Request, Response, NextFunction } from "express";
 import { BadRequestError, NotFoundError } from "../errors";
 
-// Get all products
 export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await pool.query("SELECT * FROM products ORDER BY last_updated DESC");
@@ -13,12 +12,10 @@ export const getAllProducts = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-// Add new product
 export const addProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { name, category, stock, unit, price, min_stock } = req.body;
 
-        // Validation
         if (!name || !category || stock === undefined || !unit || price === undefined || min_stock === undefined) {
             throw new BadRequestError("Please provide all required fields: name, category, stock, unit, price, min_stock");
         }
@@ -59,13 +56,11 @@ export const addProduct = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-// Update product by ID
 export const updateProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
         const { name, category, stock, unit, price, min_stock } = req.body;
 
-        // Validation
         if (!id) {
             throw new BadRequestError("Product ID is required");
         }
@@ -118,7 +113,6 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-// Delete product by ID
 export const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;

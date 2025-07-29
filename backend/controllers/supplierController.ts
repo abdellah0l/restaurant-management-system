@@ -16,7 +16,6 @@ export const createSupplier = async (req: Request, res: Response, next: NextFunc
   try {
     const { name, phone, email, address, total_debt = 0, total_paid = 0 } = req.body;
 
-    // Validation
     if (!name || !phone || !address) {
       throw new BadRequestError('Please provide all required fields: name, phone, address');
     }
@@ -65,7 +64,6 @@ export const updateSupplier = async (req: Request, res: Response, next: NextFunc
     const { id } = req.params;
     const { name, phone, email, address, total_debt, total_paid } = req.body;
 
-    // Validation
     if (!id) {
       throw new BadRequestError('Supplier ID is required');
     }

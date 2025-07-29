@@ -3,7 +3,6 @@ import { Pool } from 'pg';
 
 dotenv.config();
 
-// Check if DATABASE_URL is set
 if (!process.env.DATABASE_URL) {
   console.error('Error: DATABASE_URL environment variable is not set.');
   process.exit(1);

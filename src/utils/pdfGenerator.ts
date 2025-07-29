@@ -92,7 +92,6 @@ export const generatePDFReport = async (reportData: any, reportType: 'daily' | '
   document.body.appendChild(reportElement);
 
   try {
-    // Convert HTML to canvas
     const canvas = await html2canvas(reportElement, {
       scale: 2,
       useCORS: true,
@@ -102,7 +101,6 @@ export const generatePDFReport = async (reportData: any, reportType: 'daily' | '
       height: reportElement.scrollHeight
     });
 
-    // Create PDF
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -110,17 +108,15 @@ export const generatePDFReport = async (reportData: any, reportType: 'daily' | '
       format: 'a4'
     });
 
-    const imgWidth = 210; // A4 width in mm
-    const pageHeight = 295; // A4 height in mm
+    const imgWidth = 210; 
+    const pageHeight = 295; 
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
     let position = 0;
 
-    // Add first page
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
 
-    // Add additional pages if needed
     while (heightLeft >= 0) {
       position = heightLeft - imgHeight;
       pdf.addPage();
@@ -128,14 +124,12 @@ export const generatePDFReport = async (reportData: any, reportType: 'daily' | '
       heightLeft -= pageHeight;
     }
 
-    // Save the PDF
     pdf.save(`${title}.pdf`);
 
   } catch (error) {
     console.error('Error generating PDF:', error);
     alert('حدث خطأ في إنشاء ملف PDF');
   } finally {
-    // Clean up
     document.body.removeChild(reportElement);
   }
 };

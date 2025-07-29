@@ -1,101 +1,98 @@
 import { Request, Response, NextFunction } from "express";
-import pool from "../db/pool";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { BadRequestError, NotFoundError, UnauthorizedError } from "../errors";
+import pool from "../db/pool";
+import { BadRequestError, UnauthorizedError } from "../errors";
 
-// Extend Express Request to allow req.user
-interface AuthenticatedRequest extends Request {
-  user?: { id: string };
+declare global {
+  namespace Express {
+    interface Request {
+      user?: { id: string; email: string };
+    }
+  }
 }
 
-const Login = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body;
-
+export const Login = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { email, password } = req.body;
+
     if (!email || !password) {
-      throw new BadRequestError("Please provide all required fields");
+      throw new BadRequestError("Please provide email and password");
     }
 
-    const query =
-      "SELECT id, email, hashedpassword FROM users WHERE email = $1";
-    const { rows } = await pool.query(query, [email]);
-    const user = rows[0];
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
 
-    if (!user) {
-      throw new NotFoundError(`This email: ${email} does not exist`);
+    if (result.rows.length === 0) {
+      throw new UnauthorizedError("Invalid credentials");
     }
 
-    const doesPasswordMatch = await bcrypt.compare(
-      password,
-      user.hashedpassword
+    const user = result.rows[0];
+    const isPasswordValid = await bcrypt.compare(password, user.hashedpassword);
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedError("Invalid credentials");
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || "fallback_secret",
+      { expiresIn: "7d" }
     );
 
-    if (!doesPasswordMatch) {
-      throw new UnauthorizedError("Incorrect password");
-    }
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      throw new Error("JWT_SECRET is not defined in the environment");
-    }
-
-    const token = jwt.sign({ id: user.id }, secret);
-
-    return res
-      .status(200)
-      .cookie("token", token, {
-        httpOnly: true,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
-      .json({
-        success: true,
-        message: "Welcome back",
-      });
+    res.json({
+      success: true,
+      message: "Login successful",
+    });
   } catch (error: any) {
-    error.customMessage = "Failed to login as admin";
+    error.customMessage = "Login failed";
     next(error);
   }
 };
 
-const getCurrentUser = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const getCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.user || {};
-    if (!id) {
+    if (!req.user) {
       throw new UnauthorizedError("User not authenticated");
     }
 
-    return res.status(200).json({
+    const result = await pool.query("SELECT id, email FROM users WHERE id = $1", [req.user.id]);
+
+    if (result.rows.length === 0) {
+      throw new UnauthorizedError("User not found");
+    }
+
+    res.json({
       success: true,
-      user: { id },
+      user: result.rows[0],
     });
   } catch (error: any) {
-    error.customMessage = "Failed to get current user information";
+    error.customMessage = "Failed to get current user";
     next(error);
   }
 };
 
-// the logout function must be like this
-const logout = async (req: Request, res: Response, next: NextFunction) => {
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "strict",
       secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
-    return res.status(200).json({
+    res.json({
       success: true,
-      message: "Logged out successfully",
+      message: "Logout successful",
     });
   } catch (error: any) {
-    error.customMessage = "Failed to logout";
+    error.customMessage = "Logout failed";
     next(error);
   }
 };
-
-
-export { Login, getCurrentUser, logout };
 

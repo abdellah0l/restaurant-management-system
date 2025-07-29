@@ -3,7 +3,6 @@ import axios from 'axios';
 
 interface User {
   id: string;
-  name: string;
   email: string;
 }
 
@@ -17,17 +16,23 @@ interface UserResponse {
   user: User;
 }
 
+interface ProfileUpdateResponse {
+  success: boolean;
+  message: string;
+  user: User;
+}
+
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  updateProfile: (email?: string, password?: string) => Promise<boolean>;
   isLoading: boolean;
   error: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Use environment variable for API URL in production, fallback to proxy in development
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -35,7 +40,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check if user is authenticated on app load
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -48,7 +52,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(data.user);
         }
       } catch (error) {
-        // User is not authenticated, which is fine
         console.log('User not authenticated');
       } finally {
         setIsLoading(false);
@@ -72,7 +75,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const data = response.data as AuthResponse;
       if (data.success) {
-        // Get current user info after successful login
         const userResponse = await axios.get(`${API_BASE}/auth/me`, {
           withCredentials: true
         });
@@ -116,12 +118,47 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const updateProfile = async (email?: string, password?: string): Promise<boolean> => {
+    try {
+      setError(null);
+      setIsLoading(true);
+
+      const updateData: any = {};
+      if (email) updateData.email = email;
+      if (password) updateData.password = password;
+
+      const response = await axios.put(`${API_BASE}/auth/profile`, updateData, {
+        withCredentials: true
+      });
+
+      const data = response.data as ProfileUpdateResponse;
+      if (data.success) {
+        setUser(data.user);
+        return true;
+      }
+      
+      return false;
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError('حدث خطأ أثناء تحديث الملف الشخصي');
+      }
+      
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <AuthContext.Provider value={{
       user,
       login,
       logout,
+      updateProfile,
       isLoading,
       error
     }}>

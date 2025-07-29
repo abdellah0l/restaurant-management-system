@@ -16,7 +16,6 @@ export const createTransaction = async (req: Request, res: Response, next: NextF
   try {
     const { type, amount, description, date } = req.body;
 
-    // Validation
     if (!type || amount === undefined || !description || !date) {
       throw new BadRequestError('Please provide all required fields: type, amount, description, date');
     }
@@ -54,7 +53,6 @@ export const updateTransaction = async (req: Request, res: Response, next: NextF
     const { id } = req.params;
     const { type, amount, description, date } = req.body;
 
-    // Validation
     if (!id) {
       throw new BadRequestError('Transaction ID is required');
     }

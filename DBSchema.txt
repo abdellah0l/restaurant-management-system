@@ -1,7 +1,6 @@
 -- USERS
 CREATE TABLE IF NOT EXISTS public.users (
-    id UUID NOT NULL DEFAULT gen_random_uuid(),
-    name VARCHAR(50) NOT NULL,
+    id UUID NOT NULL DEFAULT gen_random_uuid(),   
     email VARCHAR(50) NOT NULL,
     hashedpassword VARCHAR(255) NOT NULL,
     CONSTRAINT users_pkey PRIMARY KEY (id),

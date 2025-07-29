@@ -1,33 +1,26 @@
-import  jwt  from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import UnauthorizedErr from "../errors/Unauthorized";
+import jwt from "jsonwebtoken";
+import { UnauthorizedError } from "../errors";
 
-// Extend the Request interface to include `user`
-interface AuthenticatedRequest extends Request {
-  user?: { id: string };
-}
-
-const isAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const token = req.cookies.token;
+export const isAuth = (req: Request, res: Response, next: NextFunction) => {
   try {
+    const token = req.cookies.token;
+
     if (!token) {
-      throw new UnauthorizedErr("You're not authorized to make this request");
+      throw new UnauthorizedError("No token provided");
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-        throw new Error("JWT_SECRET is not defined in environment variables");
-    }
-
-    const decoded = jwt.verify(token, secret) as { id: string };
-    req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret") as any;
+    req.user = { id: decoded.id, email: decoded.email };
 
     next();
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    if (error.name === "JsonWebTokenError") {
+      error = new UnauthorizedError("Invalid token");
+    } else if (error.name === "TokenExpiredError") {
+      error = new UnauthorizedError("Token expired");
+    }
     next(error);
   }
 };
-
-export { isAuth };
 

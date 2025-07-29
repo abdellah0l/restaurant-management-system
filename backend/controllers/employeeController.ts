@@ -16,7 +16,6 @@ export const createEmployee = async (req: Request, res: Response, next: NextFunc
   try {
     const { name, phone, position, salary, advances = 0, bonus = 0, penalties = 0, hire_date } = req.body;
 
-    // Validation
     if (!name || !phone || !position || salary === undefined) {
       throw new BadRequestError('Please provide all required fields: name, phone, position, salary');
     }
@@ -72,7 +71,6 @@ export const updateEmployee = async (req: Request, res: Response, next: NextFunc
     const { id } = req.params;
     const { name, phone, position, salary, advances, bonus, penalties, hire_date } = req.body;
 
-    // Validation
     if (!id) {
       throw new BadRequestError('Employee ID is required');
     }

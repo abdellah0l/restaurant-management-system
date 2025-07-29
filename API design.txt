@@ -31,15 +31,3 @@
 ## Reports
 - GET    /api/reports/daily      - Get daily financial report (sales, purchases, expenses, net profit, transactions)
 - GET    /api/reports/monthly    - Get monthly financial report (sales, purchases, expenses, net profit, transactions)
-
-## for the main page (dashboard)
-- we need : 
-    
-  const dailyReport = getDailyReport();
-  const monthlyReport = getMonthlyReport();
-
-  const lowStockProducts = products.filter(p => p.stock <= p.minStock);
-  const totalDebt = suppliers.reduce((sum, supplier) => sum + supplier.totalDebt, 0);
-
-## for the stock management
-- we need : 

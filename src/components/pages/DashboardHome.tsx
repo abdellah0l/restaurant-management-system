@@ -1,6 +1,5 @@
 import React from 'react';
 import { useData } from '../../contexts/DataContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { 
   TrendingUp, 
@@ -16,7 +15,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const   DashboardHome: React.FC = () => {
   const { products, suppliers, employees, getDailyReport, getMonthlyReport } = useData();
-  const { user } = useAuth();
 
   const dailyReport = getDailyReport();
   const monthlyReport = getMonthlyReport();
@@ -64,7 +62,7 @@ const   DashboardHome: React.FC = () => {
       <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-4 md:p-6 text-white">
         <h1 className="text-xl md:text-3xl font-bold mb-2">مرحباً بك في نظام إدارة المطعم</h1>
         <p className="text-emerald-100">
-          مرحباً {user?.name}، هنا ملخص شامل لأداء المطعم اليوم
+          مرحباً مدير النظام، هنا ملخص شامل لأداء المطعم اليوم
         </p>
         <div className="mt-4 flex items-center space-x-4 space-x-reverse">
           <Calendar className="h-5 w-5" />

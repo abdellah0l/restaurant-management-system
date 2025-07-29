@@ -20,5 +20,5 @@ const errorHandlingMiddleware = (
       message: err.customMessage || "Internal server error...",
     });
 };
-
 export default errorHandlingMiddleware;
+
