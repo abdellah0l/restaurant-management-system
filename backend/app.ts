@@ -22,6 +22,10 @@ app.use(cors({
   credentials: true,
 }));
 
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", message: "Server is running" });
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);
 app.use('/api/suppliers', supplierRoutes);

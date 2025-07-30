@@ -23,14 +23,14 @@ export const Login = async (req: Request, res: Response, next: NextFunction) => 
     const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
 
     if (result.rows.length === 0) {
-      throw new UnauthorizedError("Invalid credentials");
+      throw new UnauthorizedError("Invalid credentials (there's no user with this email)");
     }
 
     const user = result.rows[0];
     const isPasswordValid = await bcrypt.compare(password, user.hashedpassword);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedError("Invalid credentials");
+      throw new UnauthorizedError("Invalid credentials (invalid password)");
     }
 
     const token = jwt.sign(
@@ -51,7 +51,10 @@ export const Login = async (req: Request, res: Response, next: NextFunction) => 
       message: "Login successful",
     });
   } catch (error: any) {
-    error.customMessage = "Login failed";
+    res.status(401).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
