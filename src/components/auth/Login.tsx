@@ -88,15 +88,6 @@ const Login: React.FC = () => {
           >
             {loading || isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
           </button>
-
-          <div className="text-center">
-            <div className="text-sm text-gray-600">
-              <p className="mb-2">حسابات تجريبية:</p>
-              <div className="space-y-1">
-                <p><strong>المدير:</strong> admin@example.com / admin123</p>
-              </div>
-            </div>
-          </div>
         </form>
       </div>
     </div>
