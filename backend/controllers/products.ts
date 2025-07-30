@@ -5,7 +5,7 @@ import { BadRequestError, NotFoundError } from "../errors";
 export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await pool.query("SELECT * FROM products ORDER BY last_updated DESC");
-        res.json(result.rows);
+        res.json(result.rows || []);
     } catch (error: any) {
         error.customMessage = "Failed to fetch products";
         next(error);

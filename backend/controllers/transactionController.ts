@@ -5,7 +5,7 @@ import { BadRequestError, NotFoundError } from '../errors';
 export const getAllTransactions = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await pool.query("SELECT * FROM transactions ORDER BY date DESC");
-    res.json(result.rows);
+    res.json(result.rows || []);
   } catch (error: any) {
     error.customMessage = "Failed to fetch transactions";
     next(error);

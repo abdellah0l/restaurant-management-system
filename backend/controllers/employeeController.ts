@@ -5,7 +5,7 @@ import { BadRequestError, NotFoundError } from '../errors';
 export const getAllEmployees = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await pool.query('SELECT * FROM employees ORDER BY hire_date DESC');
-    res.json(result.rows);
+    res.json(result.rows || []);
   } catch (error: any) {
     error.customMessage = 'Failed to fetch employees';
     next(error);

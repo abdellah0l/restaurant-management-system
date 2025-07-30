@@ -5,7 +5,7 @@ import { BadRequestError, NotFoundError } from '../errors';
 export const getAllSuppliers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await pool.query('SELECT * FROM suppliers ORDER BY name ASC');
-    res.json(result.rows);
+    res.json(result.rows || []);
   } catch (error: any) {
     error.customMessage = 'Failed to fetch suppliers';
     next(error);
