@@ -310,6 +310,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   onChange={(e) => setSettingsForm({...settingsForm, password: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="أدخل كلمة المرور الجديدة"
+                  autoComplete="new-password"
                 />
               </div>
 
@@ -324,6 +325,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     onChange={(e) => setSettingsForm({...settingsForm, confirmPassword: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="أعد إدخال كلمة المرور"
+                    autoComplete="new-password"
                   />
                 </div>
               )}

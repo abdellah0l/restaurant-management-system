@@ -164,6 +164,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (email) updateData.email = email;
       if (password) updateData.password = password;
 
+      console.log('Sending profile update with data:', updateData);
+
       const response = await axios.put(`${API_BASE}/auth/profile`, updateData, {
         withCredentials: true
       });
