@@ -22,11 +22,18 @@ interface ProfileUpdateResponse {
   user: User;
 }
 
+interface VerificationResponse {
+  success: boolean;
+  message: string;
+  email: string;
+}
+
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  updateProfile: (email?: string, password?: string) => Promise<boolean>;
+  requestVerificationCode: (email?: string, password?: string) => Promise<boolean>;
+  updateProfile: (verificationCode: string, email?: string, password?: string) => Promise<boolean>;
   isLoading: boolean;
   error: string | null;
 }
@@ -118,12 +125,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const updateProfile = async (email?: string, password?: string): Promise<boolean> => {
+  const requestVerificationCode = async (email?: string, password?: string): Promise<boolean> => {
     try {
       setError(null);
       setIsLoading(true);
 
-      const updateData: any = {};
+      const requestData: any = {};
+      if (email) requestData.email = email;
+      if (password) requestData.password = password;
+
+      const response = await axios.post(`${API_BASE}/auth/request-verification`, requestData, {
+        withCredentials: true
+      });
+
+      const data = response.data as VerificationResponse;
+      return data.success;
+    } catch (error: any) {
+      console.error('Verification request error:', error);
+      
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError('حدث خطأ أثناء إرسال رمز التحقق');
+      }
+      
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateProfile = async (verificationCode: string, email?: string, password?: string): Promise<boolean> => {
+    try {
+      setError(null);
+      setIsLoading(true);
+
+      const updateData: any = { verificationCode };
       if (email) updateData.email = email;
       if (password) updateData.password = password;
 
@@ -158,6 +195,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       user,
       login,
       logout,
+      requestVerificationCode,
       updateProfile,
       isLoading,
       error

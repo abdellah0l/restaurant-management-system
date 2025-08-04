@@ -10,6 +10,7 @@ import supplierRoutes from './routes/suppliers';
 import employeeRoutes from './routes/employees';
 import transactionRoutes from './routes/transactions';
 import reportRoutes from './routes/reports';
+import { verifyEmailConfig } from './services/emailService';
 
 dotenv.config();
 
@@ -54,11 +55,22 @@ app.use(errorHandlingMiddleware);
 
 const port = process.env.PORT || 8080;
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`🚀 Server running on port ${port}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
   console.log(`🗄️ Database URL: ${process.env.DATABASE_URL ? 'Set' : 'NOT SET'}`);
   console.log(`🔐 JWT Secret: ${process.env.JWT_SECRET ? 'Set' : 'NOT SET'}`);
+  
+  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    const emailReady = await verifyEmailConfig();
+    if (emailReady) {
+      console.log(`📧 Email service: Ready`);
+    } else {
+      console.log(`⚠️ Email service: Configuration error`);
+    }
+  } else {
+    console.log(`⚠️ Email service: Not configured (EMAIL_USER/EMAIL_PASS missing)`);
+  }
 }).on('error', (error) => {
   console.error('❌ Server failed to start:', error);
   process.exit(1);
