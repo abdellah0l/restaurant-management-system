@@ -51,6 +51,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     };
   }, [showNotifications, showSettings, showVerification]);
 
+  // Debug useEffect to monitor state changes
+  useEffect(() => {
+    console.log('showVerification state changed to:', showVerification);
+  }, [showVerification]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -90,7 +95,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     if (success) {
       console.log('Closing settings modal and opening verification modal');
       setShowSettings(false);
-      setShowVerification(true);
+      // Force state update with timeout to ensure it takes effect
+      setTimeout(() => {
+        setShowVerification(true);
+        console.log('Verification modal should now be visible');
+      }, 100);
+      console.log('State update commands sent');
     } else {
       console.log('Failed to request verification code');
     }
@@ -255,9 +265,20 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             className="flex items-center space-x-2 space-x-reverse px-2 md:px-4 py-2 text-gray-700 hover:text-red-600 transition-colors"
           >
             <LogOut className="h-5 w-5" />
-            <span className="hidden sm:inline">تسجيل الخروج</span>
-          </button>
-            </div>
+                          <span className="hidden sm:inline">تسجيل الخروج</span>
+            </button>
+            
+            {/* Temporary manual trigger */}
+            <button
+              onClick={() => {
+                console.log('Manual trigger clicked');
+                setShowVerification(true);
+              }}
+              className="ml-2 px-2 py-1 bg-red-500 text-white rounded text-xs"
+            >
+              Manual Verify
+            </button>
+          </div>
         </div>
       </div>
     </header>
