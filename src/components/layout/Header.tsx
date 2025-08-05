@@ -355,6 +355,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
               <div className="flex space-x-4 space-x-reverse pt-4">
                 <button
+                  onClick={() => setShowVerification(true)}
                   type="submit"
                   disabled={isRequestingCode}
                   className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
