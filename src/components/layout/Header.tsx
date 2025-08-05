@@ -86,9 +86,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       settingsForm.password || undefined
     );
 
+    console.log('Verification code request result:', success);
     if (success) {
+      console.log('Closing settings modal and opening verification modal');
       setShowSettings(false);
       setShowVerification(true);
+    } else {
+      console.log('Failed to request verification code');
     }
     setIsRequestingCode(false);
   };
@@ -350,6 +354,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       )}
 
       {/* Verification Modal */}
+      {console.log('showVerification state:', showVerification)}
       {showVerification && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" ref={verificationRef}>
