@@ -11,8 +11,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { user, logout, updateProfile, requestVerificationCode, error: authError } = useAuth();
   const { products } = useData();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showVerification, setShowVerification] = useState(false);
+  const [modal, setModal] = useState<'settings' | 'verification' | null>(null);
   const [settingsForm, setSettingsForm] = useState({
     email: '',
     password: '',
@@ -35,26 +34,23 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         setShowNotifications(false);
       }
       if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
-        setShowSettings(false);
+        setModal(null);
       }
       if (verificationRef.current && !verificationRef.current.contains(event.target as Node)) {
-        setShowVerification(false);
+        setModal(null);
       }
     };
 
-    if (showNotifications || showSettings || showVerification) {
+    if (showNotifications || modal) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showNotifications, showSettings, showVerification]);
+  }, [showNotifications, modal]);
 
-  // Debug useEffect to monitor state changes
-  useEffect(() => {
-    console.log('showVerification state changed to:', showVerification);
-  }, [showVerification]);
+
 
   const handleLogout = async () => {
     try {
@@ -91,18 +87,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       settingsForm.password || undefined
     );
 
-    console.log('Verification code request result:', success);
     if (success) {
-      console.log('Closing settings modal and opening verification modal');
-      setShowSettings(false);
-      // Force state update with timeout to ensure it takes effect
+      setModal(null);
+      // Use timeout to ensure proper modal transition
       setTimeout(() => {
-        setShowVerification(true);
-        console.log('Verification modal should now be visible');
-      }, 100);
-      console.log('State update commands sent');
-    } else {
-      console.log('Failed to request verification code');
+        setModal('verification');
+      }, 200);
     }
     setIsRequestingCode(false);
   };
@@ -131,7 +121,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       setSettingsSuccess('تم تحديث الملف الشخصي بنجاح');
       setSettingsForm({ email: '', password: '', confirmPassword: '' });
       setVerificationForm({ code: '' });
-      setShowVerification(false);
+      setModal(null);
       setTimeout(() => {
         setSettingsSuccess(null);
       }, 2000);
@@ -254,7 +244,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </div>
 
               <button
-                onClick={() => setShowSettings(true)}
+                onClick={() => setModal('settings')}
                 className="flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <Settings className="h-5 w-5" />
@@ -268,29 +258,20 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                           <span className="hidden sm:inline">تسجيل الخروج</span>
             </button>
             
-            {/* Temporary manual trigger */}
-            <button
-              onClick={() => {
-                console.log('Manual trigger clicked');
-                setShowVerification(true);
-              }}
-              className="ml-2 px-2 py-1 bg-red-500 text-white rounded text-xs"
-            >
-              Manual Verify
-            </button>
+
           </div>
         </div>
       </div>
     </header>
 
       {/* Settings Modal */}
-      {showSettings && (
+      {modal === 'settings' && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" ref={settingsRef}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">إعدادات الحساب</h2>
               <button
-                onClick={() => setShowSettings(false)}
+                onClick={() => setModal(null)}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="h-5 w-5" />
@@ -355,7 +336,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
               <div className="flex space-x-4 space-x-reverse pt-4">
                 <button
-                  onClick={() => setShowVerification(true)}
+                  
                   type="submit"
                   disabled={isRequestingCode}
                   className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
@@ -364,7 +345,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowSettings(false)}
+                  onClick={() => setModal(null)}
                   className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors font-medium"
                 >
                   إلغاء
@@ -376,14 +357,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       )}
 
       {/* Verification Modal */}
-      {console.log('showVerification state:', showVerification)}
-      {showVerification && (
+      {modal === 'verification' && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" ref={verificationRef}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900">رمز التحقق</h2>
               <button
-                onClick={() => setShowVerification(false)}
+                onClick={() => setModal(null)}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="h-5 w-5" />
@@ -431,7 +411,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowVerification(false)}
+                  onClick={() => setModal(null)}
                   className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors font-medium"
                 >
                   إلغاء
