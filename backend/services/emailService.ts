@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// Create transporter for Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -9,12 +10,11 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Generate a random 6-digit verification code
 export const generateVerificationCode = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Send verification code email
+
 export const sendVerificationEmail = async (email: string, code: string): Promise<boolean> => {
   try {
     const mailOptions = {

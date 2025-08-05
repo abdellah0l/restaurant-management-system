@@ -27,6 +27,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const notificationRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const verificationRef = useRef<HTMLDivElement>(null);
+  const [pendingVerification, setPendingVerification] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,6 +51,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     };
   }, [showNotifications, modal]);
 
+  useEffect(() => {
+    if (pendingVerification && modal === null) {
+      setModal('verification');
+      setPendingVerification(false);
+    }
+  }, [pendingVerification, modal]);
 
 
   const handleLogout = async () => {
@@ -88,11 +95,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     );
 
     if (success) {
+      setPendingVerification(true);
       setModal(null);
-      // Use timeout to ensure proper modal transition
-      setTimeout(() => {
-        setModal('verification');
-      }, 200);
     }
     setIsRequestingCode(false);
   };
@@ -162,267 +166,267 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   return (
     <>
-    <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-        <button
-          onClick={onMenuClick}
-                className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500 md:hidden"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-              <div className="ml-4 md:ml-0">
-                <h1 className="text-xl font-semibold text-gray-900">نظام إدارة المخزون</h1>
+      <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+          <button
+            onClick={onMenuClick}
+                  className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500 md:hidden"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+                <div className="ml-4 md:ml-0">
+                  <h1 className="text-xl font-semibold text-gray-900">نظام إدارة المخزون</h1>
+                </div>
               </div>
-        </div>
 
-        <div className="flex items-center space-x-4 space-x-reverse">
-              <div className="relative" ref={notificationRef}>
-                <button 
-                  onClick={() => setShowNotifications(!showNotifications)} 
-                  className="hidden md:flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 transition-colors relative"
-                >
-            <Bell className="h-5 w-5" />
-                  {notificationCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {notificationCount > 9 ? '9+' : notificationCount}
-                    </span>
-                  )}
-                </button>
-
-                {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                    <div className="p-4 border-b border-gray-200">
-                      <h3 className="text-lg font-semibold text-gray-900">تنبيهات المخزون</h3>
-                    </div>
-                    
-                    <div className="max-h-64 overflow-y-auto">
-                      {lowStockProducts.length === 0 ? (
-                        <div className="p-4 text-center text-gray-500">
-                          لا توجد منتجات منخفضة في المخزون
-                        </div>
-                      ) : (
-                        lowStockProducts.map((product) => {
-                          const status = getStockStatus(product.stock, product.minStock);
-                          return (
-                            <div key={product.id} className="p-4 border-b border-gray-100 hover:bg-gray-50">
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <h4 className="text-sm font-medium text-gray-900">{product.name}</h4>
-                                  <p className="text-sm text-gray-600">
-                                    المخزون الحالي: {product.stock} {product.unit}
-                                  </p>
-                                  <p className="text-sm text-gray-600">
-                                    الحد الأدنى: {product.minStock} {product.unit}
-                                  </p>
-                                </div>
-                                <div className="flex items-center space-x-2 space-x-reverse">
-                                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(status)}`}>
-                                    {getStatusText(status)}
-                                  </span>
-                                  {status === 'critical' && (
-                                    <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })
+              <div className="flex items-center space-x-4 space-x-reverse">
+                    <div className="relative" ref={notificationRef}>
+                      <button 
+                        onClick={() => setShowNotifications(!showNotifications)} 
+                        className="hidden md:flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 transition-colors relative"
+                      >
+                <Bell className="h-5 w-5" />
+                      {notificationCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          {notificationCount > 9 ? '9+' : notificationCount}
+                        </span>
                       )}
-                    </div>
-                    
-                    {lowStockProducts.length > 0 && (
-                      <div className="p-4 border-t border-gray-200 bg-gray-50">
-                        <p className="text-sm text-gray-600 text-center">
-                          إجمالي المنتجات المنخفضة: {lowStockProducts.length}
-                        </p>
+                    </button>
+
+                    {showNotifications && (
+                      <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        <div className="p-4 border-b border-gray-200">
+                          <h3 className="text-lg font-semibold text-gray-900">تنبيهات المخزون</h3>
+                        </div>
+                        
+                        <div className="max-h-64 overflow-y-auto">
+                          {lowStockProducts.length === 0 ? (
+                            <div className="p-4 text-center text-gray-500">
+                              لا توجد منتجات منخفضة في المخزون
+                            </div>
+                          ) : (
+                            lowStockProducts.map((product) => {
+                              const status = getStockStatus(product.stock, product.minStock);
+                              return (
+                                <div key={product.id} className="p-4 border-b border-gray-100 hover:bg-gray-50">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                      <h4 className="text-sm font-medium text-gray-900">{product.name}</h4>
+                                      <p className="text-sm text-gray-600">
+                                        المخزون الحالي: {product.stock} {product.unit}
+                                      </p>
+                                      <p className="text-sm text-gray-600">
+                                        الحد الأدنى: {product.minStock} {product.unit}
+                                      </p>
+                                    </div>
+                                    <div className="flex items-center space-x-2 space-x-reverse">
+                                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(status)}`}>
+                                        {getStatusText(status)}
+                                      </span>
+                                      {status === 'critical' && (
+                                        <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                        
+                        {lowStockProducts.length > 0 && (
+                          <div className="p-4 border-t border-gray-200 bg-gray-50">
+                            <p className="text-sm text-gray-600 text-center">
+                              إجمالي المنتجات المنخفضة: {lowStockProducts.length}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
 
-              <button
-                onClick={() => setModal('settings')}
-                className="flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <Settings className="h-5 w-5" />
-          </button>
-          
-          <button
-                onClick={handleLogout}
-            className="flex items-center space-x-2 space-x-reverse px-2 md:px-4 py-2 text-gray-700 hover:text-red-600 transition-colors"
-          >
-            <LogOut className="h-5 w-5" />
-                          <span className="hidden sm:inline">تسجيل الخروج</span>
-            </button>
-            
-
-          </div>
-        </div>
-      </div>
-    </header>
-
-      {/* Settings Modal */}
-      {modal === 'settings' && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" ref={settingsRef}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">إعدادات الحساب</h2>
-              <button
-                onClick={() => setModal(null)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
+                  <button
+                    onClick={() => setModal('settings')}
+                    className="flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <Settings className="h-5 w-5" />
               </button>
+              
+              <button
+                    onClick={handleLogout}
+                className="flex items-center space-x-2 space-x-reverse px-2 md:px-4 py-2 text-gray-700 hover:text-red-600 transition-colors"
+              >
+                <LogOut className="h-5 w-5" />
+                            <span className="hidden sm:inline">تسجيل الخروج</span>
+                </button>
+                
+
+              </div>
             </div>
+          </div>
+        </header>
 
-            <form onSubmit={handleSettingsSubmit} className="space-y-4">
-              {(settingsError || authError) && (
-                <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">
-                  {settingsError || authError}
-                </div>
-              )}
-
-              {settingsSuccess && (
-                <div className="bg-green-100 text-green-800 p-3 rounded-lg text-sm">
-                  {settingsSuccess}
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  البريد الإلكتروني الجديد (اختياري)
-                </label>
-                <input
-                  type="email"
-                  value={settingsForm.email}
-                  onChange={(e) => setSettingsForm({...settingsForm, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="أدخل البريد الإلكتروني الجديد"
-                />
+        {/* Settings Modal */}
+        {modal === 'settings' && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" ref={settingsRef}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">إعدادات الحساب</h2>
+                <button
+                  onClick={() => setModal(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  كلمة المرور الجديدة (اختياري)
-                </label>
-                <input
-                  type="password"
-                  value={settingsForm.password}
-                  onChange={(e) => setSettingsForm({...settingsForm, password: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="أدخل كلمة المرور الجديدة"
-                  autoComplete="new-password"
-                />
-              </div>
+              <form onSubmit={handleSettingsSubmit} className="space-y-4">
+                {(settingsError || authError) && (
+                  <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">
+                    {settingsError || authError}
+                  </div>
+                )}
 
-              {settingsForm.password && (
+                {settingsSuccess && (
+                  <div className="bg-green-100 text-green-800 p-3 rounded-lg text-sm">
+                    {settingsSuccess}
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    تأكيد كلمة المرور
+                    البريد الإلكتروني الجديد (اختياري)
+                  </label>
+                  <input
+                    type="email"
+                    value={settingsForm.email}
+                    onChange={(e) => setSettingsForm({...settingsForm, email: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="أدخل البريد الإلكتروني الجديد"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    كلمة المرور الجديدة (اختياري)
                   </label>
                   <input
                     type="password"
-                    value={settingsForm.confirmPassword}
-                    onChange={(e) => setSettingsForm({...settingsForm, confirmPassword: e.target.value})}
+                    value={settingsForm.password}
+                    onChange={(e) => setSettingsForm({...settingsForm, password: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    placeholder="أعد إدخال كلمة المرور"
+                    placeholder="أدخل كلمة المرور الجديدة"
                     autoComplete="new-password"
                   />
                 </div>
-              )}
 
-              <div className="flex space-x-4 space-x-reverse pt-4">
-                <button
-                  
-                  type="submit"
-                  disabled={isRequestingCode}
-                  className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isRequestingCode ? 'جاري الإرسال...' : 'إرسال رمز التحقق'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setModal(null)}
-                  className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors font-medium"
-                >
-                  إلغاء
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+                {settingsForm.password && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      تأكيد كلمة المرور
+                    </label>
+                    <input
+                      type="password"
+                      value={settingsForm.confirmPassword}
+                      onChange={(e) => setSettingsForm({...settingsForm, confirmPassword: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="أعد إدخال كلمة المرور"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                )}
 
-      {/* Verification Modal */}
-      {modal === 'verification' && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" ref={verificationRef}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">رمز التحقق</h2>
-              <button
-                onClick={() => setModal(null)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="text-center mb-6">
-              <Mail className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">
-                تم إرسال رمز التحقق إلى:
-              </p>
-              <p className="font-medium text-gray-900">{user?.email}</p>
-              <p className="text-sm text-gray-500 mt-2">
-                يرجى إدخال الرمز المكون من 6 أرقام
-              </p>
-            </div>
-
-            <form onSubmit={handleVerificationSubmit} className="space-y-4">
-              {verificationError && (
-                <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">
-                  {verificationError}
+                <div className="flex space-x-4 space-x-reverse pt-4">
+                  <button
+                    
+                    type="submit"
+                    disabled={isRequestingCode}
+                    className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isRequestingCode ? 'جاري الإرسال...' : 'إرسال رمز التحقق'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModal(null)}
+                    className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+                  >
+                    إلغاء
+                  </button>
                 </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  رمز التحقق
-                </label>
-                <input
-                  type="text"
-                  value={verificationForm.code}
-                  onChange={(e) => setVerificationForm({...verificationForm, code: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-center text-lg tracking-widest"
-                  placeholder="000000"
-                  maxLength={6}
-                />
-              </div>
-
-              <div className="flex space-x-4 space-x-reverse pt-4">
-                <button
-                  type="submit"
-                  className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
-                >
-                  تأكيد التحديث
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setModal(null)}
-                  className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors font-medium"
-                >
-                  إلغاء
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
-    </>
-  );
-};
+        )}
 
-export default Header;
+        {/* Verification Modal */}
+        {modal === 'verification' && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl max-w-md w-full mx-4 p-6" ref={verificationRef}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">رمز التحقق</h2>
+                <button
+                  onClick={() => setModal(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="text-center mb-6">
+                <Mail className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
+                <p className="text-gray-600 mb-2">
+                  تم إرسال رمز التحقق إلى:
+                </p>
+                <p className="font-medium text-gray-900">{user?.email}</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  يرجى إدخال الرمز المكون من 6 أرقام
+                </p>
+              </div>
+
+              <form onSubmit={handleVerificationSubmit} className="space-y-4">
+                {verificationError && (
+                  <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm">
+                    {verificationError}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    رمز التحقق
+                  </label>
+                  <input
+                    type="text"
+                    value={verificationForm.code}
+                    onChange={(e) => setVerificationForm({...verificationForm, code: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-center text-lg tracking-widest"
+                    placeholder="000000"
+                    maxLength={6}
+                  />
+                </div>
+
+                <div className="flex space-x-4 space-x-reverse pt-4">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+                  >
+                    تأكيد التحديث
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModal(null)}
+                    className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  export default Header;

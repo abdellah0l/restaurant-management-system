@@ -128,16 +128,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const requestVerificationCode = async (email?: string, password?: string): Promise<boolean> => {
     try {
       setError(null);
-      setIsLoading(true);
-
       const requestData: any = {};
       if (email) requestData.email = email;
       if (password) requestData.password = password;
-
       const response = await axios.post(`${API_BASE}/auth/request-verification`, requestData, {
         withCredentials: true
       });
-
       const data = response.data as VerificationResponse;
       return data.success;
     } catch (error: any) {
@@ -151,25 +147,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       return false;
     } finally {
-      setIsLoading(false);
     }
   };
 
   const updateProfile = async (verificationCode: string, email?: string, password?: string): Promise<boolean> => {
     try {
       setError(null);
-      setIsLoading(true);
-
       const updateData: any = { verificationCode };
       if (email) updateData.email = email;
       if (password) updateData.password = password;
-
-      console.log('Sending profile update with data:', updateData);
-
       const response = await axios.put(`${API_BASE}/auth/profile`, updateData, {
         withCredentials: true
       });
-
       const data = response.data as ProfileUpdateResponse;
       if (data.success) {
         setUser(data.user);
@@ -188,7 +177,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       return false;
     } finally {
-      setIsLoading(false);
     }
   };
 
