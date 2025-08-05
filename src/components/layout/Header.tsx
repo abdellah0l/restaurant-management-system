@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
-  const { logout, updateProfile, requestVerificationCode, error: authError } = useAuth();
+  const { user, logout, updateProfile, requestVerificationCode, error: authError } = useAuth();
   const { products } = useData();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -25,7 +25,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [settingsSuccess, setSettingsSuccess] = useState<string | null>(null);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [isRequestingCode, setIsRequestingCode] = useState(false);
-  const [targetEmail, setTargetEmail] = useState<string>('');
   const notificationRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const verificationRef = useRef<HTMLDivElement>(null);
@@ -88,7 +87,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     );
 
     if (success) {
-      setTargetEmail(settingsForm.email || 'your email');
       setShowSettings(false);
       setShowVerification(true);
     }
@@ -160,28 +158,28 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   return (
     <>
-      <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <button
-                onClick={onMenuClick}
+        <button
+          onClick={onMenuClick}
                 className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500 md:hidden"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
+        >
+          <Menu className="h-6 w-6" />
+        </button>
               <div className="ml-4 md:ml-0">
                 <h1 className="text-xl font-semibold text-gray-900">نظام إدارة المخزون</h1>
               </div>
-            </div>
+        </div>
 
-            <div className="flex items-center space-x-4 space-x-reverse">
+        <div className="flex items-center space-x-4 space-x-reverse">
               <div className="relative" ref={notificationRef}>
                 <button 
                   onClick={() => setShowNotifications(!showNotifications)} 
                   className="hidden md:flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 transition-colors relative"
                 >
-                  <Bell className="h-5 w-5" />
+            <Bell className="h-5 w-5" />
                   {notificationCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                       {notificationCount > 9 ? '9+' : notificationCount}
@@ -246,19 +244,19 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 className="flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <Settings className="h-5 w-5" />
-              </button>
-
-              <button
+          </button>
+          
+          <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 space-x-reverse px-2 md:px-4 py-2 text-gray-700 hover:text-red-600 transition-colors"
-              >
-                <LogOut className="h-5 w-5" />
-                <span className="hidden sm:inline">تسجيل الخروج</span>
-              </button>
+            className="flex items-center space-x-2 space-x-reverse px-2 md:px-4 py-2 text-gray-700 hover:text-red-600 transition-colors"
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="hidden sm:inline">تسجيل الخروج</span>
+          </button>
             </div>
-          </div>
         </div>
-      </header>
+      </div>
+    </header>
 
       {/* Settings Modal */}
       {showSettings && (
@@ -370,7 +368,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <p className="text-gray-600 mb-2">
                 تم إرسال رمز التحقق إلى:
               </p>
-              <p className="font-medium text-gray-900">{targetEmail}</p>
+              <p className="font-medium text-gray-900">{user?.email}</p>
               <p className="text-sm text-gray-500 mt-2">
                 يرجى إدخال الرمز المكون من 6 أرقام
               </p>

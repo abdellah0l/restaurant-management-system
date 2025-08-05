@@ -28,7 +28,10 @@ export const requestVerificationCode = async (req: Request, res: Response, next:
         }
 
         const currentEmail = currentUser.rows[0].email;
-        const targetEmail = email || currentEmail;
+        
+        // SECURITY FIX: Always send verification code to CURRENT email in database
+        // This prevents unauthorized email changes
+        const verificationEmail = currentEmail;
 
         if (email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -44,18 +47,18 @@ export const requestVerificationCode = async (req: Request, res: Response, next:
         }
 
         const verificationCode = generateVerificationCode();
-        const emailSent = await sendVerificationEmail(targetEmail, verificationCode);
+        const emailSent = await sendVerificationEmail(verificationEmail, verificationCode);
 
         if (!emailSent) {
             throw new BadRequestError("Failed to send verification email");
         }
 
-        storeVerificationCode(targetEmail, verificationCode);
+        storeVerificationCode(verificationEmail, verificationCode);
 
         return res.status(200).json({
             success: true,
             message: "Verification code sent to your email",
-            email: targetEmail
+            email: verificationEmail
         });
     } catch (error: any) {
         error.customMessage = "Failed to send verification code";
@@ -92,9 +95,17 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
         }
 
         const currentEmail = currentUser.rows[0].email;
-        const targetEmail = email || currentEmail;
+        
+        // SECURITY FIX: Always verify against current email in database
+        // This ensures only the legitimate user can make changes
+        const verificationEmail = currentEmail;
 
-        const isCodeValid = verifyCode(targetEmail, verificationCode);
+        console.log('Attempting to verify code for email:', verificationEmail);
+        console.log('Verification code received:', verificationCode);
+        
+        const isCodeValid = verifyCode(verificationEmail, verificationCode);
+        console.log('Code verification result:', isCodeValid);
+        
         if (!isCodeValid) {
             throw new BadRequestError("Invalid or expired verification code");
         }

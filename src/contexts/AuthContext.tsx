@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.log('User not authenticated');
       } finally {
-        setIsLoading(false);
+    setIsLoading(false);
       }
     };
 
@@ -89,8 +89,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const userData = userResponse.data as UserResponse;
         if (userData.success) {
           setUser(userData.user);
-          return true;
-        }
+      return true;
+    }
       }
       
       return false;
@@ -107,7 +107,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setError('حدث خطأ أثناء تسجيل الدخول');
       }
       
-      return false;
+    return false;
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      setUser(null);
+    setUser(null);
     }
   };
 
